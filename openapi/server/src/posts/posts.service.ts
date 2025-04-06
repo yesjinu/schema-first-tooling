@@ -1,86 +1,71 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
 import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import {
-  Post,
-  PostsConnection,
-  PostsIdPatchRequest,
-  PostsPostRequest,
-} from 'generated';
+  CreatePostDto,
+  UpdatePostDto,
+  PostDto,
+  PostsConnectionDto,
+} from './post.dto';
+
 @Injectable()
 export class PostsService {
-  private posts: Post[] = [
-    { id: 1, title: 'First Post', body: 'This is the first post.' },
-    { id: 2, title: 'Second Post', body: 'This is the second post.' },
-    { id: 3, title: 'Third Post', body: 'This is the third post.' },
-    { id: 4, title: 'Fourth Post', body: 'This is the fourth post.' },
-    { id: 5, title: 'Fifth Post', body: 'This is the fifth post.' },
-    { id: 6, title: 'Sixth Post', body: 'This is the sixth post.' },
-    { id: 7, title: 'Seventh Post', body: 'This is the seventh post.' },
-    { id: 8, title: 'Eighth Post', body: 'This is the eighth post.' },
-    { id: 9, title: 'Ninth Post', body: 'This is the ninth post.' },
-    { id: 10, title: 'Tenth Post', body: 'This is the tenth post.' },
-  ];
-  private nextId = this.posts.length + 1;
+  private posts: PostDto[] = [];
+  private idCounter = 1;
 
-  getManyPaginated(first?: number, after?: string): PostsConnection {
-    const afterId = after ? parseInt(after, 10) : 0;
-    const limit = first ?? this.posts.length;
-
-    const filteredPosts = this.posts.filter((p) => p.id > afterId);
-    const edges = filteredPosts.slice(0, limit).map((post) => ({
-      cursor: post.id.toString(),
-      node: post,
-    }));
-
-    const endCursor = edges.length > 0 ? edges[edges.length - 1].cursor : null;
-    const hasNextPage =
-      filteredPosts.length > limit &&
-      this.posts.some((p) => p.id > parseInt(endCursor ?? '0', 10));
-
-    const connection: PostsConnection = {
-      edges: edges,
-      pageInfo: {
-        hasNextPage: hasNextPage,
-        endCursor: endCursor,
-      },
+  create(createPostDto: CreatePostDto): PostDto {
+    const post: PostDto = {
+      id: this.idCounter++,
+      ...createPostDto,
     };
-    return connection;
+    this.posts.push(post);
+    return post;
   }
 
-  getWithId(id: number): Post {
-    const post = this.posts.find((p) => p.id === id);
+  findAll(first = 10, after?: string): PostsConnectionDto {
+    let startIndex = 0;
+    if (after) {
+      const decodedCursor = parseInt(Buffer.from(after, 'base64').toString());
+      startIndex =
+        this.posts.findIndex((post) => post.id === decodedCursor) + 1;
+    }
+
+    const slicedPosts = this.posts.slice(startIndex, startIndex + first);
+
+    const edges = slicedPosts.map((post) => ({
+      node: post,
+      cursor: Buffer.from(String(post.id)).toString('base64'),
+    }));
+
+    const hasNextPage = startIndex + first < this.posts.length;
+    const endCursor = edges.length ? edges[edges.length - 1].cursor : '';
+
+    return {
+      edges,
+      pageInfo: {
+        hasNextPage,
+        endCursor,
+      },
+    };
+  }
+
+  findOne(id: number): PostDto {
+    const post = this.posts.find((post) => post.id === id);
     if (!post) {
       throw new NotFoundException(`Post with ID ${id} not found`);
     }
     return post;
   }
 
-  updateWithId(id: number, postsIdPatchRequest?: PostsIdPatchRequest): Post {
-    const postIndex = this.posts.findIndex((p) => p.id === id);
+  update(id: number, updatePostDto: UpdatePostDto): PostDto {
+    const postIndex = this.posts.findIndex((post) => post.id === id);
     if (postIndex === -1) {
       throw new NotFoundException(`Post with ID ${id} not found`);
     }
-    const updatedPost = { ...this.posts[postIndex], ...postsIdPatchRequest };
-    this.posts[postIndex] = updatedPost;
 
-    return updatedPost;
-  }
-
-  create(postsPostRequest?: PostsPostRequest): Post {
-    if (!postsPostRequest || !postsPostRequest.title) {
-      throw new BadRequestException('Title is required');
-    }
-
-    const newPost: Post = {
-      id: this.nextId++,
-      title: postsPostRequest.title,
-      body: postsPostRequest.body,
+    this.posts[postIndex] = {
+      ...this.posts[postIndex],
+      ...updatePostDto,
     };
 
-    this.posts.push(newPost);
-    return newPost;
+    return this.posts[postIndex];
   }
 }
