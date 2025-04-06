@@ -1,5 +1,6 @@
 - server
   - nest/swagger 데코레이터 사용
+  - 서버 실행 시, `/api-yaml` Path에 OpenAPI 문서 생성됨
 - client
   - orval 라이브러리 사용
-  - orval.config.ts 작성
+  - `npx orval` 명령어로 `src/api-client/` 하위에 클라이언트 코드 (types, hooks) 생성
