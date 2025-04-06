@@ -33,7 +33,7 @@ export class PostsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Create a post' })
+  @ApiOperation({ operationId: 'createPost', summary: 'Create a post' })
   @ApiResponse({
     status: 201,
     description: 'Post created successfully',
@@ -44,7 +44,7 @@ export class PostsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all posts' })
+  @ApiOperation({ operationId: 'getPosts', summary: 'Get all posts' })
   @ApiQuery({
     name: 'first',
     required: false,
@@ -71,7 +71,7 @@ export class PostsController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get a post by id' })
+  @ApiOperation({ operationId: 'getPostById', summary: 'Get a post by id' })
   @ApiParam({
     name: 'id',
     required: true,
@@ -100,7 +100,7 @@ export class PostsController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update a post' })
+  @ApiOperation({ operationId: 'updatePost', summary: 'Update a post' })
   @ApiParam({
     name: 'id',
     required: true,

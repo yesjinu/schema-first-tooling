@@ -1,18 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { useGetPosts, usePostPosts, patchPostsId } from "@/api-client/hooks";
-import type { Post, PostPostsBody, PatchPostsIdBody } from "@/api-client/model"; 
+import { updatePost, useCreatePost, useGetPosts } from "@/api-client/hooks";
+import type { PostDto, CreatePostDto, UpdatePostBody } from "@/api-client/model"; 
 import axios from "axios";
 
 axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function Home() {
   const { data, error, isLoading, mutate } = useGetPosts(); 
-  const { trigger: createPost, isMutating: isCreating } = usePostPosts();
+  const { trigger: createPost, isMutating: isCreating } = useCreatePost();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingPost, setEditingPost] = useState<Post | null>(null);
+  const [editingPost, setEditingPost] = useState<PostDto | null>(null);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [apiError, setApiError] = useState<string | null>(null); 
@@ -27,7 +27,7 @@ export default function Home() {
     setIsModalOpen(true);
   };
 
-  const handleEditClick = (post: Post) => {
+  const handleEditClick = (post: PostDto) => {
     setEditingPost(post);
     setTitle(post.title);
     setBody(post.body);
@@ -61,9 +61,9 @@ export default function Home() {
 
     try {
       if (isEditing) {
-        await patchPostsId(editingPost.id, postData as PatchPostsIdBody);
+        await updatePost(editingPost.id, postData as UpdatePostBody);
       } else {
-        await createPost(postData as PostPostsBody); 
+        await createPost(postData as CreatePostDto); 
       }
       mutate(); 
       handleCloseModal(); 

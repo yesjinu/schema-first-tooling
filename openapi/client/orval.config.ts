@@ -10,7 +10,7 @@ const config: Config = {
       client: "swr",
     },
     input: {
-      target: "./openapi.yaml", // NestJS swagger json
+      target: "http://localhost:3000/api-yaml",
     },
   },
 };
