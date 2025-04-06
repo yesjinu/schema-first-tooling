@@ -9,7 +9,6 @@ import {
   PostsIdPatchRequest,
   PostsPostRequest,
 } from 'generated';
-
 @Injectable()
 export class PostsService {
   private posts: Post[] = [
@@ -24,7 +23,7 @@ export class PostsService {
     { id: 9, title: 'Ninth Post', body: 'This is the ninth post.' },
     { id: 10, title: 'Tenth Post', body: 'This is the tenth post.' },
   ];
-  private nextId = 10;
+  private nextId = this.posts.length + 1;
 
   getManyPaginated(first?: number, after?: string): PostsConnection {
     const afterId = after ? parseInt(after, 10) : 0;
