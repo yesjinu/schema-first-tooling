@@ -79,84 +79,89 @@ export default function Home() {
   };
 
 
-  if (isLoading) return <div>Loading posts...</div>;
-  if (error) return <div>Error loading posts: {error.message}</div>;
+  if (isLoading) return <div className="flex justify-center items-center min-h-screen text-lg font-medium text-gray-600">Loading posts...</div>;
+  if (error) return <div className="flex justify-center items-center min-h-screen text-lg font-medium text-red-600">Error loading posts: {error.message}</div>;
 
   const posts = data?.data?.edges || [];
 
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center mb-4">
-         <h1 className="text-2xl font-bold">Blog Posts</h1>
+    <div className="container mx-auto p-6 max-w-5xl">
+      <div className="flex justify-between items-center mb-8 pb-4 border-b border-gray-200">
+         <h1 className="text-3xl font-bold">Blog Posts</h1>
          <button
             onClick={handleAddClick}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-5 rounded-lg transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 shadow-md"
          >
             Add Post
          </button>
       </div>
       {posts.length === 0 ? (
-         <div>No posts found.</div>
+         <div className="text-center py-12 bg-gray-50 rounded-xl border border-gray-200">
+           <p className="text-lg text-gray-500">No posts found.</p>
+           <p className="text-sm text-gray-400 mt-2">Click 'Add Post' to create your first post.</p>
+         </div>
       ) : (
-         <ul className="space-y-4">
+         <ul className="space-y-5">
            {posts.map((edge) => (
              <li
                key={edge.cursor}
-               className="bg-white border rounded p-4 shadow cursor-pointer hover:bg-gray-50"
+               className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
                onClick={() => handleEditClick(edge.node)}
              >
-               <h2 className="text-black text-xl font-semibold">{edge.node.title}</h2>
-               <p className="text-gray-600">{edge.node.body}</p>
-               <p className="text-sm text-gray-400 mt-2">ID: {edge.node.id}</p>
+               <h2 className="text-gray-800 text-xl font-semibold mb-2">{edge.node.title}</h2>
+               <p className="text-gray-600 mb-3">{edge.node.body}</p>
+               <p className="text-xs text-gray-400 mt-2 font-mono">ID: {edge.node.id}</p>
              </li>
            ))}
          </ul>
       )}
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex justify-center items-center">
-          <div className="relative bg-white p-8 border w-full max-w-md m-4 rounded shadow-lg">
-            <h2 className="text-xl font-bold mb-4 text-black">
+        <div className="fixed inset-0 bg-opacity-40 backdrop-blur-md overflow-y-auto h-full w-full z-50 flex justify-center items-center">
+          <div className="relative bg-white p-8 border border-4 border-gray-500 w-full max-w-md m-4 rounded-xl shadow-2xl">
+            <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">
                {editingPost ? "Edit Post" : "Add New Post"}
             </h2>
             <form onSubmit={handleFormSubmit}>
-              <div className="mb-4">
-                <label htmlFor="title" className="block text-gray-700 text-sm font-bold mb-2">Title</label>
+              <div className="mb-5">
+                <label htmlFor="title" className="block text-gray-700 text-sm font-semibold mb-2">Title</label>
                 <input
                   type="text"
                   id="title"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  className="shadow-sm border border-gray-300 rounded-lg w-full py-2.5 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200"
                   required
                 />
               </div>
               <div className="mb-6">
-                <label htmlFor="body" className="block text-gray-700 text-sm font-bold mb-2">Body</label>
+                <label htmlFor="body" className="block text-gray-700 text-sm font-semibold mb-2">Body</label>
                 <textarea
                   id="body"
                   value={body}
                   onChange={(e) => setBody(e.target.value)}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline h-32"
+                  className="shadow-sm border border-gray-300 rounded-lg w-full py-2.5 px-4 text-gray-700 mb-3 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 h-36 resize-none"
                   required
                 />
               </div>
               {apiError && (
-                 <p className="text-red-500 text-xs italic mb-4">{apiError}</p>
+                 <div className="mb-5 p-3 bg-red-100 border-l-4 border-red-500 text-red-700 rounded">
+                   <p className="text-sm">{apiError}</p>
+                 </div>
               )}
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-3 pt-2">
                 <button
                   type="submit"
                   disabled={isCreating || isUpdating}
-                  className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-5 rounded-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 shadow-md disabled:opacity-50 disabled:cursor-not-allowed w-1/2"
                 >
                   {isCreating || isUpdating ? "Saving..." : "Save Post"}
                 </button>
                 <button
                   type="button"
                   onClick={handleCloseModal}
-                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2.5 px-5 rounded-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50 w-1/2"
                 >
                   Cancel
                 </button>
@@ -164,7 +169,8 @@ export default function Home() {
             </form>
             <button
               onClick={handleCloseModal}
-              className="absolute top-0 right-0 mt-4 mr-4 text-gray-500 hover:text-gray-700"
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition duration-200"
+              aria-label="Close"
             >
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
