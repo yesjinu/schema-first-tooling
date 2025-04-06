@@ -1,8 +1,5 @@
 - server
-    - openapi-generator-cli 사용
-    - openapi-generator-cli generate -g typescript-nestjs -i ./openapi.yaml -o ./generated
-    - 이를 이용해 코드 작성
+  - nest/swagger 데코레이터 사용
 - client
-    - orval 라이브러리 사용
-    - orval.config.ts 작성 
-    - 
+  - orval 라이브러리 사용
+  - orval.config.ts 작성
