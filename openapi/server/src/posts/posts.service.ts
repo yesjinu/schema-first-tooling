@@ -9,7 +9,6 @@ import {
   PostsIdPatchRequest,
   PostsPostRequest,
 } from 'generated';
-import { Observable, of } from 'rxjs';
 
 @Injectable()
 export class PostsService {

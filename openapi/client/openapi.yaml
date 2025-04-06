@@ -1,0 +1,154 @@
+# OpenAPI demo
+openapi: 3.1.0
+info: 
+  title: OpenAPI demo
+  version: 1.0.0
+  description: Simple APIs for managing posts
+servers:
+  - url: http://localhost:3000
+    description: Local server
+  - url: https://api.example.com
+    description: Production server
+paths:
+  /posts:
+    post:
+      summary: Create a post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                body:
+                  type: string
+              required:
+                - title
+                - body
+      responses:
+        '201':
+          description: Post created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+    get:
+      summary: Get all posts
+      parameters:
+        - name: first
+          in: query
+          schema:
+            type: number
+            default: 10
+        - name: after
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of posts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostsConnection'
+  /posts/{id}:
+    get:
+      summary: Get a post by id
+      parameters:
+        - $ref: '#/components/parameters/PostId'
+      responses:
+        '200':
+          description: A post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    patch:
+      summary: Update a post
+      parameters:
+        - $ref: '#/components/parameters/PostId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                body:
+                  type: string
+      responses:
+        '200':
+          description: A post
+        '404':
+          description: Post not found
+        '400':
+          description: Invalid request body
+
+components:
+  schemas:
+    Post:
+      type: object
+      properties:
+        id:
+          type: number
+          description: The unique identifier for the post
+        title:
+          type: string
+          description: The title of the post
+        body:
+          type: string
+          description: The body of the post
+      required:
+        - id
+        - title
+        - body
+    PostEdge:
+      type: object
+      properties:
+        node:
+          $ref: '#/components/schemas/Post'
+        cursor:
+          type: string
+      required:
+        - node
+        - cursor
+    PageInfo:
+      type: object
+      properties:
+        hasNextPage:
+          type: boolean
+        endCursor:
+          type: string
+      required:
+        - hasNextPage
+        - endCursor
+    PostsConnection:
+      type: object
+      properties:
+        edges:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostEdge'
+        pageInfo:
+          $ref: '#/components/schemas/PageInfo'
+      required:
+        - edges
+        - pageInfo
+  parameters:
+    PostId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: number
+  responses:
+    NotFound:
+      description: The resource was not found
+    BadRequest:
+      description: The request was invalid
