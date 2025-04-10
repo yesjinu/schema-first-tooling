@@ -1,0 +1,55 @@
+# Represents a single blog post
+type Post {
+  id: ID!
+  title: String!
+  body: String!
+}
+
+# Relay-style edge for the Post type
+type PostEdge {
+  node: Post!
+  cursor: String!
+}
+
+# Information about pagination in a connection
+type PageInfo {
+  hasNextPage: Boolean!
+  endCursor: String!
+}
+
+# Relay-style connection for Posts
+type PostsConnection {
+  edges: [PostEdge!]!
+  pageInfo: PageInfo!
+}
+
+# Input type for creating a new post
+input CreatePostInput {
+  title: String!
+  body: String!
+}
+
+# Input type for updating an existing post
+input UpdatePostInput {
+  id: ID!
+  title: String
+  body: String
+}
+
+# Queries for fetching posts
+type Query {
+  # Get a list of posts with optional pagination
+  posts(first: Int = 10, after: String): PostsConnection!
+
+  # Get a single post by its ID
+  post(id: ID!): Post
+}
+
+# Mutations for modifying posts
+type Mutation {
+  # Create a new post
+  createPost(input: CreatePostInput!): Post!
+
+  # Update an existing post
+  updatePost(input: UpdatePostInput!): Post
+}

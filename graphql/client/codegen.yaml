@@ -1,0 +1,11 @@
+schema: "http://localhost:3000/graphql"        # GraphQL 스키마 경로 (원격 또는 로컬 파일)
+documents: "src/**/*.{ts,tsx,graphql}"         # 프론트엔드에서 정의한 GraphQL 쿼리/뮤테이션 문서 경로
+generates:
+  src/graphql/generated.tsx:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-react-apollo"
+    config:
+      withHooks: true          # React 훅 생성 활성화
+      apolloClientVersion: 3   # Apollo Client v3 기준으로 생성
